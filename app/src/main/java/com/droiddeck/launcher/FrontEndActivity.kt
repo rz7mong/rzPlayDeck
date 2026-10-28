@@ -417,6 +417,54 @@ class FrontEndActivity : ComponentActivity() {
         GameSaves.savesDir().mkdirs()
         pickSaveDir.launch(InAppFilePicker.buildDirIntent(this, getString(R.string.main_saves_pick_folder, name, layout.label(this)), GameSaves.savesDir().path))
     }
+    private fun launchInstaller(record: com.droiddeck.launcher.frontend.GameInstaller.Record) {
+        Thread({
+            val command = try { com.droiddeck.launcher.frontend.GameInstaller.installerCommand(this, record) } catch (e: Exception) {
+                Log.w(TAG, "installer: ${e.message}"); null
+            }
+            ui.post {
+                if (isDestroyed) return@post
+                if (command == null) {
+                    android.widget.Toast.makeText(this, R.string.game_link_failed, android.widget.Toast.LENGTH_LONG).show()
+                    return@post
+                }
+                com.droiddeck.launcher.session.NoSteamLaunch.remember(command)
+                val next = Intent(this, SessionActivity::class.java)
+                    .returnTo(false)
+                    .putExtra(SessionService.EXTRA_MODE, SessionService.MODE_RUN)
+                    .putExtra(SessionService.EXTRA_PROGRAM, command.program)
+                    .putExtra(SessionService.EXTRA_PROGRAM_ARGS, command.args.toTypedArray())
+                    .putExtra(SessionService.EXTRA_GAME_ID, com.droiddeck.launcher.frontend.GameInstaller.scope(record))
+                when {
+                    !SessionState.running -> startSessionOrWait(next)
+                    SessionState.stopRequested -> android.widget.Toast.makeText(this, R.string.game_link_session_busy, android.widget.Toast.LENGTH_LONG).show()
+                    SessionState.mode == SessionService.MODE_RUN && SessionState.program == command.program && SessionState.programArgs == command.args ->
+                        startActivity(Intent(this, SessionActivity::class.java).setAction(SessionService.ACTION_RESUME)
+                            .returnTo(false)
+                            .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP))
+                    else -> pendingSwitch = next
+                }
+            }
+        }, "installer-launch").start()
+    }
+
+    private fun finishInstaller(record: com.droiddeck.launcher.frontend.GameInstaller.Record) {
+        Thread({
+            val result = try { com.droiddeck.launcher.frontend.GameInstaller.finish(this, record) } catch (e: Exception) {
+                Log.w(TAG, "installer: ${e.message}"); com.droiddeck.launcher.frontend.GameInstaller.FinishResult.NoGameFound
+            }
+            ui.post {
+                when (result) {
+                    is com.droiddeck.launcher.frontend.GameInstaller.FinishResult.Installed -> {
+                        updateAddedGames(result.games.map { it.folder.path }, then = { fetchAddedGameArt() })
+                        refreshAddedGames()
+                    }
+                    else -> android.widget.Toast.makeText(this, R.string.games_added_none, android.widget.Toast.LENGTH_LONG).show()
+                }
+            }
+        }, "installer-finish").start()
+    }
+
     private fun addGameExe(path: String) {
         val exe = java.io.File(path)
         if (com.droiddeck.launcher.frontend.GameInstaller.isInstallerExe(exe)) {
@@ -425,7 +473,7 @@ class FrontEndActivity : ComponentActivity() {
                     Log.w(TAG, "installer: ${e.message}"); null
                 }
                 ui.post {
-                    Log.i(TAG, "installer recorded: ${record?.targetPath}")
+                    if (record != null) launchInstaller(record)
                 }
             }, "add-game-installer").start()
             return
@@ -1065,6 +1113,14 @@ class FrontEndActivity : ComponentActivity() {
                         onExportGameFile = { g -> pickGameExport(g) },
                         onSyncGameFiles = { pickGameExport(null) },
                         onAddGameExe = { path -> addGameExe(path) },
+                        onLaunchInstaller = { path ->
+                            com.droiddeck.launcher.frontend.GameInstaller.list(this)
+                                .firstOrNull { it.installerPath == path }?.let { launchInstaller(it) }
+                        },
+                        onFinishInstaller = { path ->
+                            com.droiddeck.launcher.frontend.GameInstaller.list(this)
+                                .firstOrNull { it.installerPath == path }?.let { finishInstaller(it) }
+                        },
                         onAddedGamesChanged = { folders ->
                             val known = steamGames.mapNotNull { it.gameFiles?.path }.toSet()
                             updateAddedGames(folders, then = { if (folders.any { it !in known }) fetchAddedGameArt() })

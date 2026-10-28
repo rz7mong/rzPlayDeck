@@ -333,6 +333,7 @@ private fun LibraryEmpty(s: FrontEndState, a: FrontEndActions, modifier: Modifie
             PageHeader(stringResource(R.string.rail_games)) {
                 if (s.steamGamesX64) ClientTag()
                 if (!s.shortcutPicker) AddGameButton { GamesDialogState.adding = true }
+        if (!s.shortcutPicker) SecondaryButton("Installer", compact = true) { GamesDialogState.installers = true }
             }
         }
         Rise(1) { Note(stringResource(if (s.shortcutPicker && s.shortcutLibraryScanning) R.string.game_shortcut_scanning else R.string.games_empty)) }
@@ -473,6 +474,7 @@ private fun LibraryHeader(
         ViewButton(s, a)
         GameFileFolderActions(s, a)
         if (!s.shortcutPicker) AddGameButton { GamesDialogState.adding = true }
+        if (!s.shortcutPicker) SecondaryButton("Installer", compact = true) { GamesDialogState.installers = true }
     }
     if (s.steamGamesX64 && narrow) Box(Modifier.padding(top = 4.dp)) { ClientTag() }
 }

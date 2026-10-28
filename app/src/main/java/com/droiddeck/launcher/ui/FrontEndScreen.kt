@@ -173,6 +173,8 @@ class FrontEndActions(
     val onExportGameFile: (Library.SteamGame) -> Unit = {},
     val onSyncGameFiles: () -> Unit = {},
     val onAddGameExe: (path: String) -> Unit = {},
+    val onLaunchInstaller: (installerPath: String) -> Unit = {},
+    val onFinishInstaller: (installerPath: String) -> Unit = {},
     val onAddedGamesChanged: (folders: List<String>) -> Unit = {},
     val onSteamGameArtChanged: (appId: Int) -> Unit = {},
     val onAddedGameRemoved: (folder: String, appId: Long?, name: String) -> Unit = { _, _, _ -> },

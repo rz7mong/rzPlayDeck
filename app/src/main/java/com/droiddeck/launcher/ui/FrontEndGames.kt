@@ -12,6 +12,7 @@ import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -95,6 +96,7 @@ internal fun ClientTag() {
 }
 
 internal object GamesDialogState {
+    var installers by androidx.compose.runtime.mutableStateOf(false)
     var adding by androidx.compose.runtime.mutableStateOf(false)
     var summary by androidx.compose.runtime.mutableStateOf<Pair<List<com.droiddeck.launcher.frontend.AddedGames.Game>, Int>?>(null)
     var editing by androidx.compose.runtime.mutableStateOf<EditRequest?>(null)
@@ -109,6 +111,29 @@ internal fun GamesDialogs(a: FrontEndActions, games: List<Library.SteamGame>) {
     val ctx = androidx.compose.ui.platform.LocalContext.current
     val scope = androidx.compose.runtime.rememberCoroutineScope()
     val st = GamesDialogState
+    if (st.installers) {
+        val pending = remember { com.droiddeck.launcher.frontend.GameInstaller.list(ctx.applicationContext) }
+        GlideAlertDialog(
+            onDismissRequest = { st.installers = false },
+            confirmButton = { SecondaryButton("Tutup", compact = true) { st.installers = false } },
+            title = { Text("Installer game") },
+            text = {
+                androidx.compose.foundation.layout.Column {
+                    if (pending.isEmpty()) Text("Belum ada installer yang dicatat.")
+                    pending.forEach { record ->
+                        Text(java.io.File(record.installerPath).name, fontWeight = FontWeight.Bold)
+                        Text(record.targetPath, fontSize = 12.sp)
+                        androidx.compose.foundation.layout.Row {
+                            SecondaryButton("Jalankan", compact = true) { a.onLaunchInstaller(record.installerPath) }
+                            SecondaryButton("Selesai install", compact = true) {
+                                a.onFinishInstaller(record.installerPath); st.installers = false
+                            }
+                        }
+                    }
+                }
+            },
+        )
+    }
     if (st.adding) ExePickerDialog(
         stringResource(R.string.games_add_title),
         onAddAll = { dir, showHidden ->

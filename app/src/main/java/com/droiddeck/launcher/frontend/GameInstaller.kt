@@ -50,14 +50,18 @@ object GameInstaller {
         return record
     }
 
+    fun scope(record: Record): String {
+        val id = CRC32().apply { update(record.installerPath.toByteArray()) }.value and 0xFFFFFFFFL
+        return if (id == 0L) "1" else id.toString()
+    }
+
     fun installerCommand(context: Context, record: Record): NoSteamLaunch.Command? {
         val installer = File(record.installerPath)
         val guestExe = AddedGames.guestPath(context, installer) ?: return null
         val guestDir = AddedGames.guestPath(context, installer.parentFile ?: return null) ?: return null
-        val id = CRC32().apply { update(record.installerPath.toByteArray()) }.value and 0xFFFFFFFFL
         return NoSteamLaunch.Command(
             NoSteamLaunch.PROTON_RUN,
-            listOf("--app", id.toString(), "--dir", guestDir, "--", guestExe),
+            listOf("--app", scope(record), "--dir", guestDir, "--", guestExe),
             installer.nameWithoutExtension,
         )
     }
