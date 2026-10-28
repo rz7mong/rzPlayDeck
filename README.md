@@ -1,3 +1,31 @@
+# 🎮 rzPlayDeck
+
+Main game PC di Android.
+
+## 🎯 Fitur yang dituju
+- Tambah game dari file sendiri
+- Jalankan game tanpa Steam
+- Install dari `setup.exe`
+- Main langsung dari folder game portable
+- Steam tetap bisa dipakai — game baru juga muncul di library Steam
+
+## ⚠️ Penting
+- Fork tidak resmi dari DroidDeck.
+- Bukan buatan Valve / Steam / DroidDeck.
+- Lisensi: GPL-3.0, atribusi upstream tetap ada.
+- Pakai game yang kamu miliki sendiri secara legal.
+- Game wajib anti-cheat online, ray tracing wajib, atau DLSS resmi
+  tidak bisa dipaksa jalan dari fork ini.
+
+## 📦 Paket
+- `id.rzmong.rzplaydeck`
+
+---
+
+## 📖 README upstream (DroidDeck)
+
+Bagian di bawah ini adalah README asli upstream, dipertahankan untuk atribusi dan petunjuk build.
+
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="artwork/droiddeck-banner-dark.svg">

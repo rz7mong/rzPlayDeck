@@ -419,6 +419,17 @@ class FrontEndActivity : ComponentActivity() {
     }
     private fun addGameExe(path: String) {
         val exe = java.io.File(path)
+        if (com.droiddeck.launcher.frontend.GameInstaller.isInstallerExe(exe)) {
+            Thread({
+                val record = try { com.droiddeck.launcher.frontend.GameInstaller.start(this, exe) } catch (e: Exception) {
+                    Log.w(TAG, "installer: ${e.message}"); null
+                }
+                ui.post {
+                    Log.i(TAG, "installer recorded: ${record?.targetPath}")
+                }
+            }, "add-game-installer").start()
+            return
+        }
         Thread({
             val result = try { com.droiddeck.launcher.frontend.AddedGames.addExe(this, exe) } catch (e: Exception) {
                 Log.w(TAG, "add game: ${e.message}"); com.droiddeck.launcher.frontend.AddedGames.AddResult.NotFound
