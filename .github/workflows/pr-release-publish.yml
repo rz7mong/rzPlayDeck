@@ -332,7 +332,7 @@ jobs:
           published=$(gh release view "$tag" -R "$repo" --json tagName,assets)
           jq -e --arg tag "$tag" '.tagName == $tag and (.assets | length) > 0' <<<"$published" >/dev/null
           release="$GITHUB_SERVER_URL/$repo/releases/tag/$tag"
-          apk=$(cd signed && ls DroidDeck-*.apk | awk 'length(a) == 0 || length($0) < length(a) { a = $0 } END { print a }')
+          apk=$(cd signed && ls rzPlayDeck-*.apk | awk 'length(a) == 0 || length($0) < length(a) { a = $0 } END { print a }')
           echo "release=$release" >> "$GITHUB_OUTPUT"
           echo "apk=$GITHUB_SERVER_URL/$repo/releases/download/$tag/$apk" >> "$GITHUB_OUTPUT"
 
