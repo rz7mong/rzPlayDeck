@@ -35,7 +35,7 @@ object GameInstaller {
 
     fun snapshotExes(folder: File): List<String> =
         folder.walkTopDown().filter { it.isFile && it.name.endsWith(".exe", ignoreCase = true) }
-            .map { it.absolutePath }.sorted()
+            .map { it.absolutePath }.sorted().toList()
 
     @Synchronized
     fun start(context: Context, installer: File, gamesRoot: File? = null): Record? {
@@ -103,7 +103,10 @@ object GameInstaller {
             val installer = o.optString("installer"); val target = o.optString("target")
             if (installer.isEmpty() || target.isEmpty()) null else Record(
                 installer, target,
-                (0 until o.optJSONArray("before")?.length().or(0)).mapNotNull { j -> o.optJSONArray("before")?.optString(j) },
+                run {
+                    val beforeArr = o.optJSONArray("before")
+                    (0 until (beforeArr?.length() ?: 0)).mapNotNull { j -> beforeArr.optString(j) }
+                },
                 o.optLong("startedAt"),
             )
         }
