@@ -56,7 +56,7 @@ class SteamIntegrationGroupTest {
     @Test fun shortcutsWaitForHome() {
         show()
         compose.onNodeWithTag("integration-action-shortcuts").assertIsNotEnabled()
-        compose.onNodeWithText("Needs DroidDeck as Home").assertExists()
+        compose.onNodeWithText("Needs rzPlayDeck as Home").assertExists()
         compose.runOnIdle { state.value = state.value.copy(home = true) }
         compose.onNodeWithTag("integration-action-shortcuts").assertIsEnabled()
     }
