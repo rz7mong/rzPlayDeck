@@ -24,7 +24,7 @@ import java.io.IOException
 class AppUpdatesTest {
     private fun apk(versionCode: Int = 9) = AppUpdates.Apk(
         "DroidDeck.apk",
-        "https://github.com/Droid-Deck/DroidDeck-CI/releases/download/t/DroidDeck.apk",
+        "https://github.com/rz7mong/rzPlayDeck/releases/download/t/rzPlayDeck.apk",
         10,
         "a".repeat(64),
         "com.droiddeck.launcher",
@@ -210,8 +210,8 @@ class AppUpdatesTest {
         val raw = """
             {
               "schema": 1,
-              "sourceRepo": "Droid-Deck/DroidDeck",
-              "ciRepo": "Droid-Deck/DroidDeck-CI",
+              "sourceRepo": "rz7mong/rzPlayDeck",
+              "ciRepo": "rz7mong/rzPlayDeck",
               "stable": null,
               "preview": {
                 "tag": "main-deadbee",
@@ -222,11 +222,11 @@ class AppUpdatesTest {
                 "version": null,
                 "versionCode": 9,
                 "publishedAt": 1,
-                "url": "https://github.com/Droid-Deck/DroidDeck-CI/releases/tag/main-deadbee",
+                "url": "https://github.com/rz7mong/rzPlayDeck/releases/tag/main-deadbee",
                 "apks": {
                   "com.droiddeck.launcher": {
                     "name": "DroidDeck-main-deadbee.apk",
-                    "url": "https://github.com/Droid-Deck/DroidDeck-CI/releases/download/main-deadbee/DroidDeck-main-deadbee.apk",
+                    "url": "https://github.com/rz7mong/rzPlayDeck/releases/download/main-deadbee/rzPlayDeck-main-deadbee.apk",
                     "size": 10,
                     "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                     "packageName": "com.droiddeck.launcher",
