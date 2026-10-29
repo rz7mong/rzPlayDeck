@@ -1,0 +1,29 @@
+name: Update rzPlayDeck app catalog
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  catalog:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Regenerate catalog.json from own releases
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python3 tools/release/update_rzplaydeck_catalog.py
+      - name: Commit catalog.json when changed
+        run: |
+          set -euo pipefail
+          git config user.name "rzPlayDeck catalog"
+          git config user.email "rzplaydeck-catalog@users.noreply.github.com"
+          git add catalog.json
+          git diff --cached --quiet && echo "catalog unchanged" || git commit -m "📦 rzPlayDeck: perbarui catalog pembaruan dari rilis terbaru" && git push
